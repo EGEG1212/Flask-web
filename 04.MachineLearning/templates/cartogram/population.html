@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block additional_head %}
+    <style>
+        /* Make the image fully responsive */
+        td img {
+            width: 100%;
+        }
+    </style>
+{% endblock %}
+{% block weather %} {{ weather|safe() }} {% endblock %}
+{% block subtitle %}
+    <small>시군구별 인구 - </small><strong>{{column_dict[option]}}</strong>
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-1"></div>
+        <div class="col-8">
+            <table>
+                <tr>
+                    <td style="text-align: center;">
+                        <img src="{{url_for('static', filename='img/population.png', q=mtime)}}"
+                                width="600" alt="인구소멸위기지역 이미지">
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-3">
+            <button class="btn btn-primary" style="margin-top: 200px;" id="b1"
+                    onclick="location.href='/cartogram/pop/crisis_area'">소멸위기지역</button><br>
+            <button class="btn btn-primary mt-3" id="b2"
+                    onclick="location.href='/cartogram/pop/crisis_ratio'">소멸비율</button>
+        </div>
+    </div>   
+{% endblock %}
+{% block additional_body %}
+<!-- 클릭하면 warning노란색으로변경!/ 다른버튼은 회색으로secondary 바뀌었음좋겠는데.. 그냥파란색임 -->
+ <!--   <script>   
+            $('button').on('click', function() {
+                $('button').removeAttr('btn btn-secondary');
+                $(this).addClass('btn btn-warning');
+            });
+        </script> -->
+
+<!-- 누르면 (잠시동안) 다른버튼이 회색으로 됨 -->
+        <script> 
+        $('#b1').click(function() {
+            $('#b2').css("background-color","#b8b7ab")
+        });
+        $('#b2').click(function() {
+            $('#b1').css("background-color","#b8b7ab")
+        });
+    </script>
+{% endblock %}

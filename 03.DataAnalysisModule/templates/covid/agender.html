@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block additional_head %}
+<!-- additional_head에 css추가 & additional_body에 js추가 -->
+<link rel="stylesheet" href="{{url_for('static', filename='css/jquery-ui.min.css')}}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+<style>
+    th,
+    td {
+        text-align: center;
+    }
+    #chartBox{
+        width : 80%;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 100px;
+        max-width : 600px;
+    }
+</style>
+{% endblock %}
+{% block weather %} {{ weather|safe() }} {% endblock %}
+{% block subtitle %}
+<strong>코로나-19 연령별/성별 현황</strong><small> - {{date}}</small>
+    {% endblock %}
+    {% block content %}
+    <div class="row">
+        <div class="col-3"></div>
+        <div class="col-9">
+            <div class="form-group">
+                <label class="control-label mr-2">날짜:</label>
+                <input type="text" name="dateCustomer" id="datepicker1">
+                <button class="btn btn-success btn-sm ml-2" id="submit" type="button">검색</button>
+                <button class="btn btn-success btn-sm ml-2" onclick="location.href='/covid/update_agender/{{date}}'">데이터
+                    가져오기</button>
+            </div>
+        </div>
+        <div class="col-1"></div>
+        <div class="col-10">
+            <table class="table table-sm">
+                <tr>
+                    <th>연령별</th>
+                    <th style="text-align: right;">확진자</th>
+                    <th>확진자비율</th>
+                    <th style="text-align: right;">사망자</th>
+                    <th>사망자비율</th>
+                    <th>치명률</th>
+                </tr>
+                {% for row in rows %}
+                {% if loop.index == 10 %} 
+                <!-- 진자는for index, value in enumerate(rows): 못쓰는대신에 loop.index 1부터시작하는 진자템플릿메뉴얼/ 11번째에 성별을 넣겠다 -->
+                <tr>
+                    <th>성별</th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td>{{row[7]}}</td>  
+                    <td style="text-align: right;">{{'{:,}'.format(row[2])}}</td>
+                    <td>{{row[3]}}%</td>
+                    <td style="text-align: right;">{{'{:,}'.format(row[4])}}</td>
+                    <td>{{row[5]}}%</td>
+                    <td>{{row[6]}}%</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="col-1"></div>
+    </div>
+
+
+    <div id = "chartBox">
+    <canvas id="chartjs-3" class="chartjs" width="800" height="800" style="display: block; width: 589px; height: 294px;"></canvas>
+    <script>
+            new Chart(document.getElementById("chartjs-3"),
+            {"type":"radar","data":{"labels":["0-9세","10-19세","20-29세","30-39세","40-49세","50-59세","60-69세","70-79세","80이상"],
+            "datasets":[{"label":"사망자비율",
+            "data":[{% for row in rows[:9] %}{{row[5]}},{% endfor %}],
+            "fill":true,
+            "backgroundColor":"rgba(255, 99, 132,0.2)",
+            "borderColor":"rgb(255, 99, 132)",
+            "pointBackgroundColor":"rgb(255, 99,132)",
+            "pointBorderColor":"#fff",
+            "pointHoverBackgroundColor":"#fff",
+            "pointHoverBorderColor":"rgb(255, 99,132)"},
+            {"label":"확진자비율",
+            "data":[{% for row in rows[:9] %}{{row[3]}},{% endfor %}],
+            "fill":true,
+            "backgroundColor":"rgba(54, 162, 235,0.2)",
+            "borderColor":"rgb(54, 162, 235)",
+            "pointBackgroundColor":"rgb(54, 162, 235)",
+            "pointBorderColor":"#fff",
+            "pointHoverBackgroundColor":"#fff",
+            "pointHoverBorderColor":"rgb(54, 162, 235)"}]},
+            "options":{"elements":{"line":{"tension":0,"borderWidth":3}}}});
+    </script>
+    </div>
+    {% endblock %}
+
+    {% block additional_body %}
+        {% include './inc/one_datepicker.html' %}
+        <script>
+            $('#submit').on('click', function (e) {
+                e.preventDefault();
+
+                date = $('#datepicker1').val();
+                endpoint = '/covid/agender?date=' + date;
+
+                window.location.href = endpoint
+
+                return false;
+        });
+    </script>
+    {% endblock %}

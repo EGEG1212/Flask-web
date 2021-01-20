@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="{{url_for('static', filename='js/05_hello.js')}}"></script> <!-- 중요_static폴더안에 js폴더안에 파일명 -->
+</head>
+<body>
+    <input type="button" onclick="SayHello()", value="Say Hello">
+    <br>
+    <img src="{{url_for('static', filename='img/이미지.jpg',q=mtime)}}"  height="300" alt="yomi">
+</body>
+</html>
+
