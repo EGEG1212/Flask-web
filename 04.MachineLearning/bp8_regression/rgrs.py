@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, session, flash, redirect, url_for
+from flask import Blueprint, render_template, request, session, g
 from flask import current_app
 from fbprophet import Prophet
 from datetime import datetime, timedelta
@@ -7,11 +7,11 @@ import pandas as pd
 import pandas_datareader as pdr
 from my_util.weather import get_weather
 
-stock_bp = Blueprint('stock_bp', __name__)
+rgrs_bp = Blueprint('rgrs_bp', __name__)
 
 
 def get_weather_main():
-    weather = None
+    ''' weather = None
     try:
         weather = session['weather']
     except:
@@ -19,14 +19,15 @@ def get_weather_main():
         weather = get_weather()
         session['weather'] = weather
         session.permanent = True
-        current_app.permanent_session_lifetime = timedelta(minutes=60)
+        current_app.permanent_session_lifetime = timedelta(minutes=60) '''
+    weather = get_weather()
     return weather
 
 
 nasdaq_dict, kospi_dict, kosdaq_dict = {}, {}, {}  # 기업리스트가 자주바뀌지않으니, 전역변수로만들어놓기
 
 
-@stock_bp.before_app_first_request  # app안에 있어서 그런지 before_app_first_request
+@rgrs_bp.before_app_first_request  # app안에 있어서 그런지 before_app_first_request
 def before_app_first_request():
     nasdaq = pd.read_csv('./static/data/NASDAQ.csv', dtype={'Symbol': str})
     for i in nasdaq.index:
@@ -39,12 +40,12 @@ def before_app_first_request():
         kosdaq_dict[kosdaq['종목코드'][i]] = kosdaq['기업명'][i]
 
 
-@stock_bp.route('/stock', methods=['GET', 'POST'])
+@rgrs_bp.route('/stock', methods=['GET', 'POST'])
 def stock():
     menu = {'ho': 0, 'da': 0, 'ml': 1, 'se': 0, 'co': 0,
             'cg': 0, 'cr': 0, 'st': 1, 'wc': 0, 're': 0}
     if request.method == 'GET':
-        return render_template('/stock/stock.html', menu=menu, weather=get_weather(),
+        return render_template('/regression/stock.html', menu=menu, weather=get_weather(),
                                nasdaq=nasdaq_dict, kospi=kospi_dict, kosdaq=kosdaq_dict)
     else:
         market = request.form['market']
@@ -101,4 +102,4 @@ def stock():
         fig.savefig(img_file)
         mtime = int(os.stat(img_file).st_mtime)
 
-        return render_template('/stock/stock_res.html', menu=menu, weather=get_weather(), mtime=mtime, company=company, code=code)
+        return render_template('/regression/stock_res.html', menu=menu, weather=get_weather(), mtime=mtime, company=company, code=code)

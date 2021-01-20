@@ -14,6 +14,11 @@ chromedriver.exe
 geckodriver.exe
 ex.ipynb
 04.MachineLearning_ckekim210119/
+.android/
+.BigNox/
+.conda/
+.conda/pkgs
+
 
 # IPython
 profile_default/
