@@ -142,8 +142,8 @@
                            data-toggle="dropdown" href="#">회귀</a>
                         <div class="dropdown-menu">
                             <a class="dropdown-item" href="#">당뇨병 BMI</a>
-                            <a class="dropdown-item" href="#">아이리스 피처</a>
-                            <a class="dropdown-item" href="#">보스톤 집값</a>
+                            <a class="dropdown-item" href="/regression/iris">아이리스 피처</a>
+                            <a class="dropdown-item" href="/regression/boston">보스톤 집값</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="/regression/stock">주가 예측</a>
                         </div>
@@ -151,13 +151,13 @@
                     <div class="dropdown-divider"></div>
                     <li class="nav-item">
                         <a class="nav-link {% if menu.cu %}active{% endif %}" 
-                           href="{% if menu.cu %}#{% else %}#{% endif %}">군집화/PCA</a>
+                           href="{% if menu.cu %}#{% else %}/cluster/cluster{% endif %}">군집화/PCA</a>
                     </li>
                     <div class="dropdown-divider"></div>
 
                     <li class="nav-item">
-                        <a class="nav-link {% if menu.re %}active{% endif %}" 
-                           href="/register">회원가입</a>
+                        <a class="nav-link {% if menu.in %}active{% endif %}" 
+                           href="/inquiry">문의사항</a>
                     </li>
                 </ul>
             </div>

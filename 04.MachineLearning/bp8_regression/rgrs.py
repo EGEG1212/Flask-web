@@ -1,9 +1,17 @@
 from flask import Blueprint, render_template, request, session, g
 from flask import current_app
+from werkzeug.utils import secure_filename  # 영어파일네임만가능;;
+from sklearn.datasets import load_boston
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.metrics import r2_score
+import matplotlib.pyplot as plt
 from fbprophet import Prophet
 from datetime import datetime, timedelta
 import os
 import pandas as pd
+import numpy as np
 import pandas_datareader as pdr
 from my_util.weather import get_weather
 
@@ -22,6 +30,120 @@ def get_weather_main():
         current_app.permanent_session_lifetime = timedelta(minutes=60) '''
     weather = get_weather()
     return weather
+
+
+@rgrs_bp.route('/boston', methods=['GET', 'POST'])
+def rg_boston():
+    menu = {'ho': 0, 'da': 0, 'ml': 10,
+            'se': 0, 'co': 0, 'cg': 0, 'cr': 0, 'wc': 0,
+            'cf': 1, 'ac': 0, 're': 0, 'cu': 0}
+    boston = load_boston()
+    data = boston.data
+    label = boston.target
+    columns = boston.feature_names
+    data = pd.DataFrame(data, columns=columns)
+    x_train, x_test, y_train, y_test = train_test_split(
+        data, label, test_size=0.2, random_state=2021)
+    sim_lr = LinearRegression()
+    sim_lr.fit(x_train['RM'].values.reshape((-1, 1)), y_train)  # 모델학습
+    y_pred = sim_lr.predict(x_test['RM'].values.reshape((-1, 1)))  # 결과예측
+    r2 = r2_score(y_test, y_pred)
+    weight = sim_lr.coef_[0]
+    bias = sim_lr.intercept_
+    line_x = np.linspace(np.min(x_test['RM']), np.max(x_test['RM']), 10)
+    line_y = sim_lr.predict(line_x.reshape((-1, 1)))
+    plt.scatter(x_test['RM'], y_test, s=10, c='black')
+    plt.plot(line_x, line_y, c='red')
+    plt.legend(['Regression line', 'Test data sample'], loc='upper left')
+    img_file = os.path.join(current_app.root_path,
+                            'static/img/regression0.png')
+    plt.savefig(img_file)  # plt.show대신 이미지저장
+
+    dt_regr = DecisionTreeRegressor(max_depth=5)
+    dt_regr.fit(x_train['RM'].values.reshape((-1, 1)), y_train)  # 모델학습
+    y_pred = dt_regr.predict(x_test['RM'].values.reshape((-1, 1)))  # 결과예측
+    dt_r2 = r2_score(y_test, y_pred)
+    line_x = np.linspace(np.min(x_test['RM']), np.max(x_test['RM']), 10)
+    line_y = dt_regr.predict(line_x.reshape((-1, 1)))
+    plt.scatter(x_test['RM'].values.reshape((-1, 1)), y_test, c='black')
+    plt.plot(line_x, line_y, c='red')
+    plt.legend(['Regression line', 'Test data sample'], loc='upper left')
+    img_file = os.path.join(current_app.root_path,
+                            'static/img/regression1.png')
+    plt.savefig(img_file)  # plt.show대신 이미지저장
+
+    mtime = int(os.stat(img_file).st_mtime)
+    return render_template('regression/boston_res.html', menu=menu, weather=get_weather_main(),
+                           r2=r2, weight=weight, bias=bias, dt_r2=dt_r2, mtime=mtime)
+
+    # if request.method == 'GET':
+    #     return render_template('regression/boston.html', menu=menu, weather=get_weather())
+    # else:
+    # test_size_number = int(request.form['test_size_number'])
+    # f_csv = request.files['csv']
+    # file_csv = os.path.join(current_app.root_path,
+    #                         'static/upload/') + f_csv.filename  # 한글파일네임가능
+    # f_csv.save(file_csv)
+    # current_app.logger.debug(
+    #     f"{test_size_number}, {f_csv}, {file_csv}")
+    # df_csv = pd.read_csv(file_csv)
+    # x_train, x_test, y_train, y_test = train_test_split(
+    #     file_csv.data, file_csv.label, f"test_size={test_size_number}, random_state=2021")
+    # sim_lr = LinearRegression()
+    # sim_lr.fit(x_train['RM'].values.reshape((-1, 1)), y_train)  # 모델학습
+    # y_pred = sim_lr.predict(x_test['RM'].values.reshape((-1, 1)))  # 결과예측
+    # r2 = r2_score(y_test, y_pred)
+    # r2result = r2.format(r2_score(y_test, y_pred))
+    # plt.title(f"단순 선형 회귀, R2 : {r2result}")
+    # line_x = np.linspace(np.min(x_test['RM']), np.max(x_test['RM']), 10)
+    # line_y = sim_lr.predict(line_x.reshape((-1, 1)))
+    # plt.scatter(x_test['RM'], y_test, s=10, c='black')
+    # plt.plot(line_x, line_y, c='red')
+    # plt.legend(['Regression line', 'Test data sample'], loc='upper left')
+    # img_file = os.path.join(current_app.root_path,
+    #                         'static/img/regression0.png')
+    # plt.savefig(img_file)  # plt.show대신 이미지저장
+    # mtime = int(os.stat(img_file).st_mtime)  # mtime각각줄필요없이 마지막에 한번만 갱신
+    # return render_template('regression/boston_res.html', menu=menu, weather=get_weather_main(),
+    #                        test_size_number=test_size_number, r2result=r2result, mtime=mtime)
+
+
+@rgrs_bp.route('/iris', methods=['GET', 'POST'])
+def iris():
+    menu = {'ho': 0, 'da': 0, 'ml': 10,
+            'se': 0, 'co': 0, 'cg': 0, 'cr': 0, 'wc': 0,
+            'cf': 0, 'ac': 0, 're': 1, 'cu': 0}
+    if request.method == 'GET':
+        return render_template('regression/iris.html', menu=menu, weather=get_weather())
+    else:
+        index = int(request.form['index'])
+        feature_name = request.form['feature']
+        column_dict = {'sl': 'Sepal length', 'sw': 'Sepal width',
+                       'pl': 'Petal length', 'pw': 'Petal width',
+                       'species': ['Setosa', 'Versicolor', 'Virginica']}
+        column_list = list(column_dict.keys())
+
+        df = pd.read_csv('static/data/iris_train.csv')
+        df.columns = column_list
+        X = df.drop(columns=feature_name, axis=1).values
+        y = df[feature_name].values
+
+        lr = LinearRegression()
+        lr.fit(X, y)
+        weight, bias = lr.coef_, lr.intercept_
+
+        df_test = pd.read_csv('static/data/iris_test.csv')
+        df_test.columns = column_list
+        X_test = df_test.drop(columns=feature_name, axis=1).values[index]
+        pred_value = np.dot(X_test, weight.T) + bias
+
+        x_test = list(df_test.iloc[index, :-1].values)
+        x_test.append(column_dict['species'][int(df_test.iloc[index, -1])])
+        org = dict(zip(column_list, x_test))
+        pred = dict(zip(column_list[:-1], [0, 0, 0, 0]))
+        pred[feature_name] = np.round(pred_value, 2)
+        return render_template('regression/iris_res.html', menu=menu, weather=get_weather(),
+                               index=index, org=org, pred=pred, feature=column_dict[feature_name])
 
 
 nasdaq_dict, kospi_dict, kosdaq_dict = {}, {}, {}  # 기업리스트가 자주바뀌지않으니, 전역변수로만들어놓기

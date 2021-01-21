@@ -175,3 +175,16 @@ def insert_seoul_bulk_data(df):
     cur.close()
     conn.close()
     return
+
+
+def insert_users(params):
+    conn = sqlite3.connect('./db/covid.db')
+    cur = conn.cursor()
+
+    sql = 'insert into users values(?,?,?);'
+    cur.execute(sql, params)
+    conn.commit()
+
+    cur.close()
+    conn.close()
+    return
