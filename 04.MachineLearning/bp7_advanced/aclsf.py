@@ -37,28 +37,26 @@ def digits():
     else:
         index = int(request.form['index'])
         index_list = list(range(index, index+5))
-        digits = load_digits()
+        digits = load_digits()  # 이미지가 필요해서 어쩔수없이ㅋ.ㅋ
         df = pd.read_csv('static/data/digits_test.csv')
         img_index_list = df['index'].values
         target_index_list = df['target'].values
-        index_list = img_index_list[index:index+5]
+        index_list = img_index_list[index:index+5]  # 여기까지 미리 만들어놓는 작업
 
-        scaler = MinMaxScaler()
-        scaled_test = scaler.fit_transform(
-            df.drop(columns=['index', 'target'], axis=1))
-        test_data = scaled_test[index:index+5, :]
+        scaler = joblib.load('static/model/digits_scaler.pkl')
+        test_data = df.iloc[index:index+5, 1:-1]
+        test_scaled = scaler.transform(test_data)
         label_list = target_index_list[index:index+5]
         lrc = joblib.load('static/model/digits_lr.pkl')
         svc = joblib.load('static/model/digits_sv.pkl')
         rfc = joblib.load('static/model/digits_rf.pkl')
-        pred_lr = lrc.predict(test_data)
-        pred_sv = svc.predict(test_data)
-        pred_rf = rfc.predict(test_data)
+        pred_lr = lrc.predict(test_scaled)
+        pred_sv = svc.predict(test_scaled)
+        pred_rf = rfc.predict(test_scaled)
 
         img_file_wo_ext = os.path.join(
             current_app.root_path, 'static/img/digit')
         for k, i in enumerate(index_list):
-            plt.style.use(['seaborn-notebook'])
             plt.figure(figsize=(2, 2))
             plt.xticks([])
             plt.yticks([])

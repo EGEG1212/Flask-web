@@ -73,7 +73,7 @@ def register():
         # db.session.add(fcuser)  # id, name 변수에 넣은 회원정보 DB에 저장 여기서자꾸에러남
         # db.session.commit()  # 커밋
         # 알람 카테고리에 따라 부트스트랩에서 다른 스타일을 적용 (success, danger)
-        flash(f'문의하신 내용에 대하여 {form.email.data}으로 곧 답변드리겠습니다!', 'success')
+        flash(f'문의하신 내용에 대하여 {form.email.data}메일로 답변드리겠습니다!', 'success')
         return redirect(url_for('index'))
     return render_template('inquiry.html', form=form, menu=menu, weather=get_weather())
 

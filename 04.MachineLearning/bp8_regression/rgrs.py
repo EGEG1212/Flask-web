@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, session, g
+from flask import Blueprint, render_template, request, session, g, flash, redirect, url_for
 from flask import current_app
 from werkzeug.utils import secure_filename  # 영어파일네임만가능;;
 from sklearn.datasets import load_boston
@@ -129,18 +129,29 @@ def iris():
         y = df[feature_name].values
 
         lr = LinearRegression()
-        lr.fit(X, y)
+        lr.fit(X, y)  # 학습시키면 weight, bias나옴
         weight, bias = lr.coef_, lr.intercept_
-
-        df_test = pd.read_csv('static/data/iris_test.csv')
-        df_test.columns = column_list
-        X_test = df_test.drop(columns=feature_name, axis=1).values[index]
+        try:
+            df_test = pd.read_csv('static/data/iris_test.csv')  # 테스트셋넣어서
+            df_test.columns = column_list
+            # 컬럼명바꿔주고, 입력받은 feature제외하고, 입력받은[index]한줄만가져오면됨
+            X_test = df_test.drop(columns=feature_name, axis=1).values[index]
+        except:
+            current_app.logger.error('index error')
+            flash(
+                f'index error : 입력하신 "{index}"인덱스는 존재하지않습니다. 인덱스 범위를 확인하세요.', 'danger')
+            return redirect(url_for('rgrs_bp.iris'))
+        # .T하면 값이 하나로 구해짐(T말고 weight = weight.reshape(1, -1)해줘도 됨)
         pred_value = np.dot(X_test, weight.T) + bias
 
         x_test = list(df_test.iloc[index, :-1].values)
-        x_test.append(column_dict['species'][int(df_test.iloc[index, -1])])
-        org = dict(zip(column_list, x_test))
+        x_test.append(column_dict['species']
+                      [int(df_test.iloc[index, -1])])  # 품종명append
+        org = dict(zip(column_list, x_test))  # values5개 x_test 묶어서 딕셔너리만들고
+        # 예측값 맨끝제외하고 4가지 sl sw pl pw 0제로로만들고
         pred = dict(zip(column_list[:-1], [0, 0, 0, 0]))
+        #{'sl':0, 'sw':0, 'pl':0, 'pw':0}
+        # 선택받은feature_name 을 넣어준다!!!!!!!!
         pred[feature_name] = np.round(pred_value, 2)
         return render_template('regression/iris_res.html', menu=menu, weather=get_weather(),
                                index=index, org=org, pred=pred, feature=column_dict[feature_name])
@@ -200,14 +211,14 @@ def stock():
         except:
             current_app.logger.error('Date error')  # 야후주식에 데이터가없으면
             flash(f'{company}_{code} 야후주식에 존재하지 않습니다', 'danger')
-            return redirect(url_for('stock_bp.stock'))
+            return redirect(url_for('rgrs_bp.stock'))
         try:
             model = Prophet(daily_seasonality=True)  # 학습모델prophet에 적용시키고
             model.fit(df)
         except:
             current_app.logger.error('Value error')  # 야후주식에 데이터가없으면
             flash(f'{company}_{code} 야후주식에 존재하지 않습니다', 'danger')
-            return redirect(url_for('stock_bp.stock'))
+            return redirect(url_for('rgrs_bp.stock'))
         future = model.make_future_dataframe(
             periods=pred_period)  # 사용자가 입력한 기간까지 예측한다
         forecast = model.predict(future)

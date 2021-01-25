@@ -25,6 +25,8 @@
                     <td>이미지</td>
                     {% for i in result.index %}
                         <td><img src="{{url_for('static', filename='img/digit'+(loop.index|string)+'.png', q=mtime)}}" width="100" alt="숫자 이미지"></td>
+                        <!-- 반복문쓰려고 리스트로 만들었닷! 루프는 1부터 시작하기 때문에 digits_model.ipynb에서 k+1해준거임  -->
+                        <!-- 만약 K+1을 안했다면 여기서 loop.index-1 해줘야함;ㅁ; -->
                     {% endfor %}
                 </tr>
                 <tr>
@@ -52,6 +54,7 @@
                     {% endfor %}
                 </tr>
                 <tr>
+                    <!-- 6줄이라 colspan="6" ((실제인덱스, 이미지, 레이블, lr, sv, rf)) -->
                     <td colspan="6" style="text-align: center;">
                         <button class="btn btn-primary" 
                                 onclick="location.href='/advanced/digits'">재실행</button>
