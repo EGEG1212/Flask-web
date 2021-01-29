@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, session, g
+from flask import Blueprint, render_template, request, session, g, flash, redirect, url_for
 from flask import current_app
 from werkzeug.utils import secure_filename  # 영어파일네임만가능;;
 from sklearn.preprocessing import StandardScaler
@@ -10,6 +10,9 @@ import matplotlib.pyplot as plt
 from my_util.weather import get_weather
 
 clus_bp = Blueprint('clus_bp', __name__)
+menu = {'ho': 0, 'da': 0, 'ml': 1,
+        'se': 0, 'co': 0, 'cg': 0, 'cr': 0, 'wc': 0,
+        'cf': 0, 'ac': 0, 're': 0, 'cu': 1}
 
 
 def get_weather_main():
@@ -28,17 +31,20 @@ def get_weather_main():
 
 @clus_bp.route('/cluster', methods=['GET', 'POST'])
 def cluster():
-    menu = {'ho': 0, 'da': 0, 'ml': 1,
-            'se': 0, 'co': 0, 'cg': 0, 'cr': 0, 'wc': 0,
-            'cf': 0, 'ac': 0, 're': 0, 'cu': 1}
     if request.method == 'GET':
         return render_template('cluster/cluster.html', menu=menu, weather=get_weather_main())
     else:
-        k_number = int(request.form['k_number'])
-        f_csv = request.files['csv']
-        file_csv = os.path.join(current_app.root_path,
-                                'static/upload/') + f_csv.filename  # 한글파일네임가능
-        f_csv.save(file_csv)
+        k_number = int(request.form['k_number'] or '2')
+        try:
+            f_csv = request.files['csv']
+            file_csv = os.path.join(current_app.root_path,
+                                    'static/upload/') + f_csv.filename  # 한글파일네임가능
+            f_csv.save(file_csv)
+        except:
+            current_app.logger.error('no file error')
+            flash(
+                f'no file error : 파일을 첨부하세요.', 'danger')
+            return redirect(url_for('clus_bp.cluster'))
         current_app.logger.debug(f"{k_number}, {f_csv}, {file_csv}")
 
         df_csv = pd.read_csv(file_csv)
@@ -78,7 +84,13 @@ def cluster():
 
         plt.figure()  # plt초기화
         for i in range(k_number):  # 입력받은 k_number
-            marker = markers[i]
+            try:
+                marker = markers[i]
+            except:
+                current_app.logger.error('index error')
+                flash(
+                    f'index error : 군집 수(K)는 7까지 입력 가능합니다.', 'danger')
+                return redirect(url_for('clus_bp.cluster'))
             x_axis_data = df[df.cluster == i]['pca_x']
             y_axis_data = df[df.cluster == i]['pca_y']
             plt.scatter(x_axis_data, y_axis_data, marker=marker)

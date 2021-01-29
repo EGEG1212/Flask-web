@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block weather %} {{ weather|safe() }} {% endblock %}
 {% block subtitle %}
-    <strong>타이타닉 생존자 이진 분류</strong>
+    <strong><i class="fas fa-anchor"></i>타이타닉<i class="fas fa-ship"></i> 생존자 이진 분류</strong>
 {% endblock %}
 {% block content %}
     <div class="row">
@@ -21,6 +21,7 @@
                     </tr>
                 </table>
             </form>
+            <small>입력 없이 실행될 경우, 인덱스[0]이 자동 입력됩니다.</small>
         </div>
         <div class="col-2"></div>
     </div>

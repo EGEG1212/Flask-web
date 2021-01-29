@@ -11,6 +11,8 @@ import my_util.drawKorea as dk
 import my_util.drawKoreaTW as tw
 
 carto_bp = Blueprint('carto_bp', __name__)
+menu = {'ho': 0, 'da': 1, 'ml': 0, 'se': 0,
+        'co': 0, 'cg': 1, 'cr': 0, 'st': 0, 'wc': 0}
 
 
 def get_weather_main():
@@ -28,8 +30,6 @@ def get_weather_main():
 
 @carto_bp.route('/pop/<option>')
 def population(option):
-    menu = {'ho': 0, 'da': 1, 'ml': 0, 'se': 0,
-            'co': 0, 'cg': 1, 'cr': 0, 'st': 0, 'wc': 0}
     df_pop = pd.read_csv('./static/data/population.csv')
     column_dict = {'crisis_area': '소멸위기지역', 'crisis_ratio': '소멸비율'}
     color_dict = {'crisis_area': 'Reds', 'crisis_ratio': 'PuBu'}
@@ -42,8 +42,6 @@ def population(option):
 
 @carto_bp.route('/coffee', methods=['GET', 'POST'])
 def coffee():
-    menu = {'ho': 0, 'da': 1, 'ml': 0, 'se': 0,
-            'co': 0, 'cg': 1, 'cr': 0, 'st': 0, 'wc': 0, 're': 0}
     if request.method == 'GET':
         return render_template('cartogram/coffee.html', menu=menu, weather=get_weather())
     else:  # POST client가 업로드한 커피지수CSV 받아오기
@@ -79,16 +77,12 @@ def coffee():
 
 @carto_bp.route('/coffee_view')
 def coffee_view():
-    menu = {'ho': 0, 'da': 1, 'ml': 0, 'se': 0,
-            'co': 0, 'cg': 1, 'cr': 0, 'st': 0, 'wc': 0, 're': 0}
     if request.method == 'GET':
         return render_template('cartogram/coffee_view.html', menu=menu, weather=get_weather())
 
 
 @carto_bp.route('/burger', methods=['GET', 'POST'])
 def burger():
-    menu = {'ho': 0, 'da': 1, 'ml': 0, 'sc': 0,
-            'co': 0, 'ca': 1, 'cr': 0, 'st': 0, 'wc': 0}
     if request.method == 'GET':
         return render_template('cartogram/burger.html', menu=menu, weather=get_weather())
     else:

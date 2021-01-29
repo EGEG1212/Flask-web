@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block weather %} {{ weather|safe() }} {% endblock %}
+{% block subtitle %}
+    <strong><i class="far fa-newspaper"></i>20 뉴스그룹 분류</strong>
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-2"></div>
+        <div class="col-8">
+            <form action="/advanced/news" method="post">
+                <table class="table table-borderless">
+                    <tr>
+                        <td><label for="index">테스트 데이터셋 인덱스</label></td>
+                        <td><input type="text" class="form-control" id="index" name="index" placeholder="0 ~ 7,369 사이의 값"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: center;">
+                            <button type="submit" class="btn btn-primary mr-2">실행</button>
+                            <button type="reset" class="btn btn-secondary">취소</button>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+            <small>입력 없이 실행될 경우, 인덱스[0]이 자동 입력됩니다.</small>
+        </div>
+        <div class="col-2"></div>
+    </div>
+{% endblock %}

@@ -1,27 +1,43 @@
 {% extends "base.html" %}
+{% block additional_head %}
+    <style>
+        td { text-align: center; }
+    </style>
+{% endblock %}
 {% block weather %} {{ weather|safe() }} {% endblock %}
 {% block subtitle %}
-    <strong>보스톤집값 회귀분석</strong><small> - LinearRegression and R2_score</small>
+    <strong><i class="fas fa-home"></i>보스톤 집값 회귀</strong>
 {% endblock %}
 {% block content %}
     <div class="row">
-        <div class="col-2"></div>
-        <div class="col-8">
-            <form action="/boston/boston" method="POST" enctype="multipart/form-data"> 
-<!-- action, enctype 제일하단에 파일받는 제이쿼리? 추가 -->
+        <div class="col-1"></div>
+        <div class="col-10">
+            <form action="/regression/boston" method="POST">
                 <table class="table table-borderless">
                     <tr>
-                        <td><label for="csv">데이터셋</label></td>
-                        <td>
-                            <div class="custom-file mb-3">
-                                <input type="file" class="custom-file-input" id="csv" name="csv">
-                                <label class="custom-file-label" for="csv">회귀할 CSV 파일 선택</label>
-                            </div>
-                        </td>
+                        <td colspan="2"><label for="index">테스트 데이터셋 인덱스</label></td>
+                        <td><input type="text" class="form-control" id="index" name="index" placeholder="0 ~ 126 사이의 값"></td>
                     </tr>
+                    <tr rowspan="15">
+                        <label for="feature"> 
+                            <td><input type="checkbox" class="form-check-input ml-1" id="selectAll"></td>
+                            <td>전체</td>
+                            <td><strong>feature 선택</strong></td>
+                        </label>
+                    </tr>
+                    {% for key, value in feature_dict.items() %}
                     <tr>
-                        <td><label for="test_size_number">test_size_number(0~0.5)</label></td>
-                        <td><input type="text" class="form-control" id="test_size_number" name="test_size_number"></td>                       </td>
+                        <div class="form-check-inline">
+                            <label class="form-check-label" for="boston{{loop.index}}">
+                                <td><input type="checkbox" class="form-check-input" id="boston{{loop.index}}" name="key" value="{{key}}"></td>
+                                <td>{{key}}</td>
+                                <td style="text-align: left;">{{value}}</td>
+                            </label>
+                        </div>
+                        {% if loop.index==13 %}
+                            <br>
+                        {% endif %}
+                    {% endfor %}
                     </tr>
                     <tr>
                         <td colspan="2" style="text-align: center;">
@@ -31,15 +47,28 @@
                     </tr>
                 </table>		
             </form>
+            <small>입력 없이 실행될 경우, 인덱스[0]이 자동 입력됩니다.</small>
+
         </div>
-        <div class="col-2"></div>
+        <div class="col-1"></div>
     </div>
 {% endblock %}
 {% block additional_body %}
     <script>
-        $(".custom-file-input").on("change", function() {
-            var fileName = $(this).val().split("\\").pop();
-            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+        $('#selectAll').on('input', () => {
+            for (let i=1; i<=13; i++) {
+                let boston = '#boston'+i
+                if ($('#selectAll')[0].checked) {
+                    $(boston)[0].checked = true
+                } else {
+                    $(boston)[0].checked = false
+                }
+                /* let boston = 'boston'+i 
+                if (document.getElementById('selectAll').checked)
+                    document.getElementById(boston).checked = true
+                else
+                    document.getElementById(boston).checked = false */
+            }
         });
     </script>
 {% endblock %}

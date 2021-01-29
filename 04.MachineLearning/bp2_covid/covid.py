@@ -14,6 +14,8 @@ import my_util.covid_util as cu
 import db.db_module as dm
 
 covid_bp = Blueprint('covid_bp', __name__)
+menu = {'ho': 0, 'da': 1, 'ml': 0, 'se': 0,
+        'co': 1, 'cg': 0, 'cr': 0, 'st': 0, 'wc': 0}
 
 
 def get_weather_main():
@@ -34,9 +36,7 @@ def get_weather_main():
 # 테이블과 Line chart로 표현...그러나 데이터가져오기 error
 @covid_bp.route('/daily')
 def daily():
-    menu = {'ho': 0, 'da': 1, 'ml': 0, 'se': 0,
-            'co': 1, 'cg': 0, 'cr': 0, 'st': 0, 'wc': 0}
-    date = request.args.get('date', datetime.now().strftime('%Y-%m-%d'))
+    date = request.args.get('date', date.today().strftime('%Y-%m-%d')) #datetime.now()를 date.today()로변경
     rows = dm.get_region_daily(date)
 
     gubun_list, defCnt_list, isolClearCnt_list = [], [], []
@@ -76,8 +76,6 @@ def update_region(date):
 # 지역별D_chart(지역별 사망자 누정수/ 전일대비 증감수-확진자/ 격리 해제 수/ 10만명당 발생률)
 @covid_bp.route('/doughnutChart', methods=['GET', 'POST'])
 def covid_index():
-    menu = {'ho': 0, 'da': 1, 'ml': 0, 'se': 0,
-            'co': 1, 'cg': 0, 'cr': 0, 'st': 0, 'wc': 0, 're': 0}
     now = date.today()
     now_str = now.strftime("%Y%m%d")
     # 오늘날짜로요청
@@ -106,7 +104,7 @@ def region_seq():
                 'co': 1, 'cg': 0, 'cr': 0, 'st': 0, 'wc': 0}
         start_date = request.args.get('startDate', '2020-01-01')
         end_date = request.args.get(
-            'endDate', datetime.now().strftime('%Y-%m-%d'))
+            'endDate', date.today().strftime('%Y-%m-%d')) #datetime.now()를 date.today()로변경
         rows = dm.get_region_items_by_gubun_with_date(
             'stdDay, incDec', '합계', start_date, end_date)
         cdf = pd.DataFrame(rows, columns=['기준일', '전국'])
@@ -140,8 +138,8 @@ def region_seq():
 
     else:
         start_date = request.form['startDate'] if request.form['startDate'] else '2020-01-01'
-        end_date = request.form['endDate'] if request.form['endDate'] else datetime.now(
-        ).strftime('%Y-%m-%d')
+        end_date = request.form['endDate'] if request.form['endDate'] else date.today(
+        ).strftime('%Y-%m-%d') #datetime.now()를 date.today()로변경
         region_list = request.form.getlist('metro') if request.form.getlist(
             'metro') else ['전국', '서울', '경기', '대구']
         region_str = ' '.join(region for region in region_list)
@@ -151,9 +149,7 @@ def region_seq():
 # 연령별/성별table+radar
 @ covid_bp.route('/agender')
 def agender():
-    menu = {'ho': 0, 'da': 1, 'ml': 0, 'se': 0,
-            'co': 1, 'cg': 0, 'cr': 0, 'st': 0, 'wc': 0}
-    date = request.args.get('date', datetime.now().strftime('%Y-%m-%d'))
+    date = request.args.get('date', date.today().strftime('%Y-%m-%d')) #datetime.now()를 date.today()로변경
     rows = dm.get_agender_daily(date)
 
     return render_template('covid/agender.html', menu=menu, weather=get_weather(),
@@ -179,7 +175,7 @@ def age_seq():
                 'co': 1, 'cg': 0, 'cr': 0, 'st': 0, 'wc': 0}
         start_date = request.args.get('startDate', '2020-01-01')
         end_date = request.args.get(
-            'endDate', datetime.now().strftime('%Y-%m-%d'))
+            'endDate', date.today().strftime('%Y-%m-%d')) #datetime.now()를 date.today()로변경
         rows = dm.get_agender_items_by_gubun_with_date(
             'stdDay, confCase', '0-9', start_date, end_date)
         adf = pd.DataFrame(rows, columns=['기준일', '0-9'])
@@ -214,8 +210,8 @@ def age_seq():
 
     else:
         start_date = request.form['startDate'] if request.form['startDate'] else '2020-01-01'
-        end_date = request.form['endDate'] if request.form['endDate'] else datetime.now(
-        ).strftime('%Y-%m-%d')
+        end_date = request.form['endDate'] if request.form['endDate'] else date.today(
+        ).strftime('%Y-%m-%d') #datetime.now()를 date.today()로변경
         age_list = request.form.getlist('age') if request.form.getlist('age') else [
             '20-29세', '50-59세', '60-69세']
         age_str = ' '.join(age for age in age_list)
@@ -250,12 +246,9 @@ def seoul_seq():
     if request.method == 'GET':
         mpl.rc('font', family='Malgun Gothic')
         mpl.rc('axes', unicode_minus=False)
-        menu = {'ho': 0, 'da': 1, 'ml': 0, 'se': 0,
-                'co': 1, 'cg': 0, 'cr': 0, 'st': 0, 'wc': 0}
-
         start_date = request.args.get('startDate', '2020-01-01')
         end_date = request.args.get(
-            'endDate', datetime.now().strftime('%Y-%m-%d'))
+            'endDate', date.today().strftime('%Y-%m-%d')) #datetime.now()를 date.today()로변경
         cdf_raw, gu_list = cu.make_corona_raw_df(start_date, end_date)
 
         gu_str = request.args.get('gu', '강서구 양천구 영등포구')
@@ -277,8 +270,8 @@ def seoul_seq():
 
     else:
         start_date = request.form['startDate'] if request.form['startDate'] else '2020-01-01'
-        end_date = request.form['endDate'] if request.form['endDate'] else datetime.now(
-        ).strftime('%Y-%m-%d')
+        end_date = request.form['endDate'] if request.form['endDate'] else date.today(
+        ).strftime('%Y-%m-%d') #datetime.now()를 date.today()로변경
         selected_gu = request.form.getlist('gu') if request.form.getlist('gu') else [
             '강서구', '양천구', '영등포구']
         gu_str = ' '.join(gu for gu in selected_gu)
@@ -293,12 +286,9 @@ def seoul_comp():
     if request.method == 'GET':
         mpl.rc('font', family='Malgun Gothic')
         mpl.rc('axes', unicode_minus=False)
-        menu = {'ho': 0, 'da': 1, 'ml': 0, 'se': 0,
-                'co': 1, 'cg': 0, 'cr': 0, 'st': 0, 'wc': 0}
-
         start_date = request.args.get('startDate', '2020-01-01')
         end_date = request.args.get(
-            'endDate', datetime.now().strftime('%Y-%m-%d'))
+            'endDate', date.today().strftime('%Y-%m-%d')) #datetime.now()를 date.today()로변경
         cdf_raw, _ = cu.make_corona_raw_df(start_date, end_date)
         cdf = cu.make_corona_df(cdf_raw)
 
@@ -333,13 +323,11 @@ def seoul_comp():
 
 @covid_bp.route('/seoul_map/<option>')
 def seoul_map(option):
-    menu = {'ho': 0, 'da': 1, 'ml': 0, 'se': 0,
-            'co': 1, 'cg': 0, 'cr': 0, 'st': 0, 'wc': 0}
     geo_data = json.load(
         open('./static/data/skorea_municipalities_geo_simple.json', encoding='utf8'))
 
     start_date = request.args.get('startDate', '2020-01-01')
-    end_date = request.args.get('endDate', datetime.now().strftime('%Y-%m-%d'))
+    end_date = request.args.get('endDate', date.today().strftime('%Y-%m-%d')) #datetime.now()를 date.today()로변경
     cdf_raw, _ = cu.make_corona_raw_df(start_date, end_date)
     cdf = cu.make_corona_df(cdf_raw)
 

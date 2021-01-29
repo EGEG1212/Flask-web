@@ -1,13 +1,14 @@
 {% extends "base.html" %}
 {% block weather %} {{ weather|safe() }} {% endblock %}
 {% block subtitle %}
-    <strong>아이리스 분류 결과</strong>
+    <strong><i class="fas fa-seedling"></i>아이리스 분류 결과</strong>
 {% endblock %}
 {% block content %}
     <div class="row">
+        <img style="background-image: url(../../static/img/photo_iris.jpg); opacity: 0.2; width: 100%; height: 100%; position: absolute; background-size: cover; " />
         <div class="col-2"></div>
         <div class="col-8">
-            <table class="table table-striped">
+            <table class="table table-striped" >
                 <tr>
                     <td>테스트 데이터셋 인덱스</td>
                     <td style="text-align: center;">{{res.index}}</td>

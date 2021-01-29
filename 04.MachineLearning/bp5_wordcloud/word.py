@@ -11,6 +11,8 @@ from my_util.wordCloud import engCloud, hanCloud
 from my_util.sports_news import get_sports_news
 
 word_bp = Blueprint('word_bp', __name__)
+menu = {'ho': 0, 'da': 1, 'ml': 0, 'se': 0,
+        'co': 0, 'cg': 0, 'cr': 0, 'st': 0, 'wc': 1}
 
 
 def get_weather_main():
@@ -28,8 +30,6 @@ def get_weather_main():
 
 @word_bp.route('/text', methods=['GET', 'POST'])
 def text():
-    menu = {'ho': 0, 'da': 1, 'ml': 0, 'se': 0,
-            'co': 0, 'cg': 0, 'cr': 0, 'st': 0, 'wc': 1}
     if request.method == 'GET':
         return render_template('wordcloud/text.html', menu=menu, weather=get_weather())
     else:
@@ -69,8 +69,6 @@ def text():
 
 @word_bp.route('/sports_news')  # 버튼누르자마자 크롤링실행;;
 def sports_news():
-    menu = {'ho': 0, 'da': 1, 'ml': 0, 'se': 0,
-            'co': 0, 'cg': 0, 'cr': 0, 'st': 0, 'wc': 1}
     # 텍스트파일 저장할 경로를 미리 정해준다음
     text_file = os.path.join(current_app.root_path, 'static/data/sports.txt')
     get_sports_news(text_file)  # sport_news.py실행

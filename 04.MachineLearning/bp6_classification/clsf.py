@@ -9,6 +9,9 @@ import pandas as pd
 from my_util.weather import get_weather
 
 clsf_bp = Blueprint('clsf_bp', __name__)
+menu = {'ho': 0, 'da': 0, 'ml': 10,
+        'se': 0, 'co': 0, 'cg': 0, 'cr': 0, 'wc': 0,
+        'cf': 1, 'ac': 0, 're': 0, 'cu': 0}
 
 
 def get_weather_main():
@@ -27,14 +30,11 @@ def get_weather_main():
 
 @clsf_bp.route('/titanic', methods=['GET', 'POST'])
 def titanic():
-    menu = {'ho': 0, 'da': 0, 'ml': 10,
-            'se': 0, 'co': 0, 'cg': 0, 'cr': 0, 'wc': 0,
-            'cf': 1, 'ac': 0, 're': 0, 'cu': 0}
     if request.method == 'GET':
         return render_template('classification/titanic.html', menu=menu, weather=get_weather())
     else:
         try:
-            index = int(request.form['index'])
+            index = int(request.form['index'] or '0')
             df = pd.read_csv('static/data/titanic_test.csv')
             scaler = joblib.load('static/model/titanic_scaler.pkl')
             test_data = df.iloc[index, :-1].values.reshape(1, -1)
@@ -69,14 +69,11 @@ def titanic():
 
 @clsf_bp.route('/pima', methods=['GET', 'POST'])
 def pima():
-    menu = {'ho': 0, 'da': 0, 'ml': 10,
-            'se': 0, 'co': 0, 'cg': 0, 'cr': 0, 'wc': 0,
-            'cf': 1, 'ac': 0, 're': 0, 'cu': 0}
     if request.method == 'GET':
         return render_template('classification/pima.html', menu=menu, weather=get_weather())
     else:
         try:
-            index = int(request.form['index'])
+            index = int(request.form['index'] or '0')
             df = pd.read_csv('static/data/pima_test.csv')
             scaler = joblib.load('static/model/pima_scaler.pkl')
             test_data = df.iloc[index, :-1].values.reshape(1, -1)
@@ -102,14 +99,11 @@ def pima():
 
 @clsf_bp.route('/cancer', methods=['GET', 'POST'])
 def cancer():
-    menu = {'ho': 0, 'da': 0, 'ml': 10,
-            'se': 0, 'co': 0, 'cg': 0, 'cr': 0, 'wc': 0,
-            'cf': 1, 'ac': 0, 're': 0, 'cu': 0}
     if request.method == 'GET':
         return render_template('classification/cancer.html', menu=menu, weather=get_weather())
     else:
         try:
-            index = int(request.form['index'])
+            index = int(request.form['index'] or '0')
             df = pd.read_csv('static/data/cancer_test.csv')
             scaler = joblib.load(
                 'static/model/cancer_scaler.pkl')  # 훈련한스케일러 불러옴
@@ -137,14 +131,11 @@ def cancer():
 
 @clsf_bp.route('/iris', methods=['GET', 'POST'])
 def iris():
-    menu = {'ho': 0, 'da': 0, 'ml': 10,
-            'se': 0, 'co': 0, 'cg': 0, 'cr': 0, 'wc': 0,
-            'cf': 1, 'ac': 0, 're': 0, 'cu': 0}
     if request.method == 'GET':
         return render_template('classification/iris.html', menu=menu, weather=get_weather())
     else:
         try:
-            index = int(request.form['index'])
+            index = int(request.form['index'] or '0')
             df = pd.read_csv('static/data/iris_test.csv')
             scaler = joblib.load('static/model/iris_scaler.pkl')
             test_data = df.iloc[index, :-1].values.reshape(1, -1)
@@ -174,14 +165,11 @@ def iris():
 
 @clsf_bp.route('/wine', methods=['GET', 'POST'])
 def wine():
-    menu = {'ho': 0, 'da': 0, 'ml': 10,
-            'se': 0, 'co': 0, 'cg': 0, 'cr': 0, 'wc': 0,
-            'cf': 1, 'ac': 0, 're': 0, 'cu': 0}
     if request.method == 'GET':
         return render_template('classification/wine.html', menu=menu, weather=get_weather())
     else:
         try:
-            index = int(request.form['index'])
+            index = int(request.form['index'] or '0')
             df = pd.read_csv('static/data/wine_test.csv')
             scaler = joblib.load('static/model/wine_scaler.pkl')
             test_data = df.iloc[index, :-1].values.reshape(1, -1)
