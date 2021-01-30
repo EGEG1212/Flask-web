@@ -1,15 +1,23 @@
 {% extends "base.html" %}
 {% block additional_head %}
     <link rel="stylesheet" href="{{url_for('static', filename='css/jquery-ui.min.css')}}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
     <style>
         th {
             text-align: center;
+        }
+        #chartBox{
+            width : 80%;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 100px;
+            max-width : 600px;
         }
     </style>
 {% endblock %}
 {% block weather %} {{ weather|safe() }} {% endblock %}
 {% block subtitle %}
-    <strong">코로나-19 지역별 현황</strong><small> - {{date}}</small>
+    <strong>코로나-19 지역별 현황</strong><small> - {{date}}</small>
 {% endblock %}
 {% block content %}
     <div class="row">
@@ -18,9 +26,7 @@
             <div class="form-group">
                 <label class="control-label mr-2">날짜:</label>
                 <input type="text" name="dateCustomer" id="datepicker1">
-                <button class="btn btn-success btn-sm ml-2" id="submit" type="button">검색</button>
-                <button class="btn btn-success btn-sm ml-2" 
-                        onclick="location.href='/covid/update_region/{{date}}'">데이터 가져오기</button>
+                <button class="btn btn-success btn-sm ml-2" id="submit" type="button" onclick="location.href='/covid/update_region/{{date}}'">검색&데이터가져오기</button>
             </div>
         </div>
     </div>
@@ -48,6 +54,36 @@
             </tr>
         {% endfor %}
     </table>
+    <div id="chartBox">
+        <script src="{{url_for('static', filename = 'Chart//dist/Chart.min.js')}}"></script>
+        <canvas id="myLineChart" width="642" height="321" style="display: block; width: 642px; height: 321px;"></canvas>
+        <script type=text/javascript>
+    
+                var gubun_list = {{ data_dict["gubun"][1:] | safe() }}
+                var defCnt_list = {{ data_dict["defCnt"][1:] }}
+                var isolClearCnt_list = {{ data_dict["isolClearCnt"][1:] }}
+            
+                var ctx = document.getElementById("myLineChart").getContext('2d');
+                var myLineChart = new Chart(ctx,{
+                    "type":"line",
+                    "data":{
+                        "labels":gubun_list,
+                        "datasets":[{
+                                "label":"사망자",
+                                "data":defCnt_list,
+                                "fill":false,
+                                "borderColor":"rgb(192, 75, 192)",
+                                "lineTension":0.2},
+                            {
+                                "label":"전일대비확진자",
+                                "data":isolClearCnt_list,
+                                "fill":false,
+                                "borderColor":"rgb(75, 192, 192)",
+                                "lineTension":0.2}]},
+         
+                    "options":{}});
+            </script>
+    </div>
 {% endblock %}
 {% block additional_body %}
     {% include './inc/one_datepicker.html' %}
@@ -56,7 +92,7 @@
             e.preventDefault();
 
             date = $('#datepicker1').val(); 
-            endpoint = '/covid/region?date=' + date;
+            endpoint = '/covid/daily?date=' + date;
 
             window.location.href = endpoint
 
