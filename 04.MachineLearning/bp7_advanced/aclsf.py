@@ -34,11 +34,14 @@ def get_weather_main():
 @aclsf_bp.before_app_first_request
 def before_app_first_request():
     global imdb_count_lr, imdb_tfidf_lr, imdb_tfidf_sv
+    global naver_count_lr, naver_tfidf_lr
     global news_count_lr, news_tfidf_lr, news_tfidf_sv
     print('============ Advanced Blueprint before_app_first_request() ==========')
     imdb_count_lr = joblib.load('static/model/IMDB_count_lr.pkl')
     imdb_tfidf_lr = joblib.load('static/model/IMDB_tfidf_lr.pkl')
     imdb_tfidf_sv = joblib.load('static/model/IMDB_tfidf_sv.pkl')
+    naver_count_lr = joblib.load('static/model/naver_cvect_lr.pkl')
+    naver_tfidf_lr = joblib.load('static/model/naver_tvect_lr.pkl')
     news_count_lr = joblib.load('static/model/news_count_lr.pkl')
     news_tfidf_lr = joblib.load('static/model/news_tfidf_lr.pkl')
     news_tfidf_sv = joblib.load('static/model/news_tfidf_sv.pkl')
@@ -168,6 +171,36 @@ def imdb():
         result_dict = {'label': label, 'pred_cl': pred_cl,
                        'pred_tl': pred_tl, 'pred_ts': pred_ts}
         return render_template('advanced/imdb_res.html', menu=menu, review=test_data[0],  # 전체리뷰
+                               res=result_dict, weather=get_weather())
+
+
+@aclsf_bp.route('/naver', methods=['GET', 'POST'])
+def naver():
+    if request.method == 'GET':
+        return render_template('advanced/naver.html', menu=menu, weather=get_weather())
+    else:
+        test_data = []
+        label = '직접 입력'
+        if request.form['option'] == 'index':
+            index = int(request.form['index'] or '0')
+            try:
+                df_test = pd.read_csv('static/data/NAVER/NAVER_test.csv')
+                test_data.append(df_test.iloc[index, 0])
+            except:
+                current_app.logger.error('index error')
+                flash(
+                    f'index error : 입력하신 "{index}"인덱스는 존재하지않습니다. 인덱스 범위를 확인하세요.', 'danger')
+                return redirect(url_for('aclsf_bp.naver'))
+            # df_test.target[index]값이 1이면 긍정, 아니면 0부정
+            label = '긍정' if df_test.label[index] else '부정'
+        else:
+            test_data.append(request.form['review'])
+
+        pred_cl = '긍정' if naver_count_lr.predict(test_data)[0] else '부정'
+        pred_tl = '긍정' if naver_tfidf_lr.predict(test_data)[0] else '부정'
+        result_dict = {'label': label, 'pred_cl': pred_cl,
+                       'pred_tl': pred_tl}
+        return render_template('advanced/naver_res.html', menu=menu, review=test_data[0],  # 전체리뷰
                                res=result_dict, weather=get_weather())
 
 
