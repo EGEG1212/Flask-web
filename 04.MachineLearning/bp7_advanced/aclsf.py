@@ -34,17 +34,19 @@ def get_weather_main():
 @aclsf_bp.before_app_first_request
 def before_app_first_request():
     global imdb_count_lr, imdb_tfidf_lr, imdb_tfidf_sv
-    global naver_count_lr, naver_tfidf_lr
+    global naver_count_lr, naver_count_nb, naver_tfidf_lr, naver_tfidf_nb
     global news_count_lr, news_tfidf_lr, news_tfidf_sv
     print('============ Advanced Blueprint before_app_first_request() ==========')
-    imdb_count_lr = joblib.load('static/model/IMDB_count_lr.pkl')
-    imdb_tfidf_lr = joblib.load('static/model/IMDB_tfidf_lr.pkl')
-    imdb_tfidf_sv = joblib.load('static/model/IMDB_tfidf_sv.pkl')
+    # imdb_count_lr = joblib.load('static/model/IMDB_count_lr.pkl')
+    # imdb_tfidf_lr = joblib.load('static/model/IMDB_tfidf_lr.pkl')
+    # imdb_tfidf_sv = joblib.load('static/model/IMDB_tfidf_sv.pkl')
     naver_count_lr = joblib.load('static/model/naver_cvect_lr.pkl')
+    naver_count_nb = joblib.load('static/model/naver_cvect_nb.pkl')
     naver_tfidf_lr = joblib.load('static/model/naver_tvect_lr.pkl')
-    news_count_lr = joblib.load('static/model/news_count_lr.pkl')
-    news_tfidf_lr = joblib.load('static/model/news_tfidf_lr.pkl')
-    news_tfidf_sv = joblib.load('static/model/news_tfidf_sv.pkl')
+    naver_tfidf_nb = joblib.load('static/model/naver_tvect_nb.pkl')
+    # news_count_lr = joblib.load('static/model/news_count_lr.pkl')
+    # news_tfidf_lr = joblib.load('static/model/news_tfidf_lr.pkl')
+    # news_tfidf_sv = joblib.load('static/model/news_tfidf_sv.pkl')
 
 
 @aclsf_bp.route('/digits', methods=['GET', 'POST'])
@@ -197,9 +199,11 @@ def naver():
             test_data.append(request.form['review'])
 
         pred_cl = '긍정' if naver_count_lr.predict(test_data)[0] else '부정'
+        pred_cn = '긍정' if naver_count_nb.predict(test_data)[0] else '부정'
         pred_tl = '긍정' if naver_tfidf_lr.predict(test_data)[0] else '부정'
-        result_dict = {'label': label, 'pred_cl': pred_cl,
-                       'pred_tl': pred_tl}
+        pred_tn = '긍정' if naver_tfidf_nb.predict(test_data)[0] else '부정'
+        result_dict = {'label': label, 'pred_cl': pred_cl, 'pred_cn': pred_cn,
+                       'pred_tl': pred_tl, 'pred_tn': pred_tn}
         return render_template('advanced/naver_res.html', menu=menu, review=test_data[0],  # 전체리뷰
                                res=result_dict, weather=get_weather())
 

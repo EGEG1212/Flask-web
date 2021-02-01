@@ -24,9 +24,18 @@
                     <td>{{res.pred_cl}}</td>
                 </tr>
                 <tr>
+                    <td>CountVectorizer + naive_bayes 분류(감성분석) 결과</td>
+                    <td>{{res.pred_cn}}</td>
+                </tr>
+                <tr>
                     <td>TfidfVectorizer + LogisticRegression 분류(감성분석) 결과</td>
                     <td>{{res.pred_tl}}</td>
                 </tr>
+                <tr>
+                    <td>TfidfVectorizer + naive_bayes 분류(감성분석) 결과</td>
+                    <td>{{res.pred_tn}}</td>
+                </tr>
+
                 <tr>
                     <td colspan="2">
                         <button class="btn btn-primary" 
