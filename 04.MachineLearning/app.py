@@ -14,6 +14,7 @@ from bp6_classification.clsf import clsf_bp
 from bp7_advanced.aclsf import aclsf_bp
 from bp8_regression.rgrs import rgrs_bp
 from bp9_clustering.clus import clus_bp
+from bpa_nat_lang.nl import nl_bp
 from my_util.weather import get_weather
 import db.db_module as dm
 from my_util.models import db  # SQLAlchemy
@@ -31,6 +32,9 @@ app.register_blueprint(clsf_bp, url_prefix='/classification')
 app.register_blueprint(aclsf_bp, url_prefix='/advanced')
 app.register_blueprint(rgrs_bp, url_prefix='/regression')
 app.register_blueprint(clus_bp, url_prefix='/cluster')
+app.register_blueprint(clus_bp, url_prefix='/cluster')
+app.register_blueprint(nl_bp, url_prefix='/nl')
+
 
 with open('./logging.json', 'r') as file:
     config = json.load(file)

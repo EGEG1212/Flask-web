@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block additional_head %}
+    <style>
+        td { text-align: center; }
+    </style>
+{% endblock %}
+{% block weather %} {{ weather|safe() }} {% endblock %}
+{% block subtitle %}
+    <strong>번역기</strong>
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-1"></div>
+        <div class="col-10">
+
+            <table class="table table-striped">
+                <tr>
+                    <td>입력 텍스트</td>
+                    <td><strong>{{res.test_data}}</strong></td>
+                </tr>
+                <tr>
+                    <td> </td>
+                    <td><strong>{{res.feature}}</strong></td>
+                </tr>
+                <tr>
+                    <td>네이버 번역기</td>
+                    <td>{{res.n_result_text}}<i class="fas fa-volume-up" onclick="play()"></i></td>
+                </tr>
+                <tr>
+                    <td>카카오번역기</td>
+                    <td>{{res.k_result_text}}</i></td>
+                </tr>
+
+                <tr>
+                    <td colspan="2">
+                        <button class="btn btn-primary" 
+                                onclick="location.href='/nl/lang'">재실행</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-1"></div>
+        <div class="col-1"></div>
+        <div class="col-10">
+        </div>
+        <div class="col-1"></div>
+    </div>
+{% endblock %}
+{% block additional_body %}
+<audio id='audio_play' src="{{url_for('static',filename='voice/cpv_sample_n_result_text.mp3', q=mtime)}}"></audio> 
+<script type="text/javascript"> 
+function play() { 
+    var audio = document.getElementById('audio_play'); 
+    if (audio.paused) { 
+        audio.play(); 
+    }else{ 
+        audio.pause(); 
+        audio.currentTime = 0 
+    } 
+} 
+</script>
+{% endblock %}

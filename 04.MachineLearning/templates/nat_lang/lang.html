@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block weather %} {{ weather|safe() }} {% endblock %}
+{% block subtitle %}
+    <strong>번역기</strong>
+{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-1"></div>
+    <div class="col-11">
+        <form action="/nl/lang" method="post">
+            <table class="table table-borderless">
+                <tr>
+                    <td>
+                        <div class="form-check-inline">
+                            <label class="form-check-label">
+                                <label for="text">입력</label>
+                            </label>
+                        </div>
+                    </td>
+                    <td>
+                        <textarea name="text" id="text" cols="80" rows="5"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td crowspan="2" style="vertical-align: center;">언어선택</td>
+                    <td>
+                        <div class="form-check-inline">
+                            <label class="form-check-label">
+                                <input type="radio" class="form-check-input" id="feature" name="feature" value="en" checked>영어
+                            </label>
+                        </div>
+                        <div class="form-check-inline">
+                            <label class="form-check-label">
+                                <input type="radio" class="form-check-input" id="feature" name="feature" value="es">스페인어
+                            </label>
+                        </div>
+                        <div class="form-check-inline">
+                            <label class="form-check-label">
+                                <input type="radio" class="form-check-input" id="feature" name="feature" value=fr>프랑스어
+                            </label>
+                        </div>
+                        <div class="form-check-inline">
+                            <label class="form-check-label">
+                                <input type="radio" class="form-check-input" id="feature" name="feature" value="vi">베트남어
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="text-align: center;">
+                        <button type="submit" class="btn btn-primary mr-2">실행</button>
+                        <button type="reset" class="btn btn-secondary">취소</button>
+                    </td>
+                </tr>
+            </table>
+        </form>
+
+    </div>
+</div>
+{% endblock %}
