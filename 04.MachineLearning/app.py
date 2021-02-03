@@ -33,7 +33,7 @@ app.register_blueprint(aclsf_bp, url_prefix='/advanced')
 app.register_blueprint(rgrs_bp, url_prefix='/regression')
 app.register_blueprint(clus_bp, url_prefix='/cluster')
 app.register_blueprint(clus_bp, url_prefix='/cluster')
-app.register_blueprint(nl_bp, url_prefix='/nl')
+app.register_blueprint(nl_bp, url_prefix='/nat_lang')
 
 
 with open('./logging.json', 'r') as file:
