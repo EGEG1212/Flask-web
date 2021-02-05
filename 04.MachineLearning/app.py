@@ -19,6 +19,8 @@ from my_util.weather import get_weather
 import db.db_module as dm
 from my_util.models import db  # SQLAlchemy
 from my_util.models import Fcuser  # 모델의 클래스 가져오기.
+# Simple integration of Flask and WTForms, including CSRF, file upload, and reCAPTCHA.
+from flask_wtf.csrf import CSRFProtect, CSRFError
 
 app = Flask(__name__)
 app.secret_key = 'qwert12345'
@@ -33,6 +35,10 @@ app.register_blueprint(aclsf_bp, url_prefix='/advanced')
 app.register_blueprint(rgrs_bp, url_prefix='/regression')
 app.register_blueprint(clus_bp, url_prefix='/cluster')
 app.register_blueprint(nl_bp, url_prefix='/nat_lang')
+# To enable CSRF protection globally for a Flask app, register the CSRFProtect extension.
+# https://flask-wtf.readthedocs.io/en/stable/csrf.html
+csrf = CSRFProtect()
+csrf.init_app(app)
 
 
 with open('./logging.json', 'r') as file:
