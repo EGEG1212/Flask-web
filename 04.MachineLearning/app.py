@@ -37,8 +37,8 @@ app.register_blueprint(clus_bp, url_prefix='/cluster')
 app.register_blueprint(nl_bp, url_prefix='/nat_lang')
 # To enable CSRF protection globally for a Flask app, register the CSRFProtect extension.
 # https://flask-wtf.readthedocs.io/en/stable/csrf.html
-csrf = CSRFProtect()
-csrf.init_app(app)
+# csrf = CSRFProtect()
+# csrf.init_app(app)
 
 
 with open('./logging.json', 'r') as file:

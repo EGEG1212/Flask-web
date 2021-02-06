@@ -3,8 +3,6 @@
 {% block content %}
     <div class="content-section">
         <form method="post" action="">
-            {{ form.hidden_tag() }}
-            
             <fieldset class="form-group">
                 <legend class="border-bottom mb-4">문의하기</legend>
                 <div class="form-group">
@@ -67,8 +65,6 @@
         </form>
     </div>
     {% endblock %}
-    {% block additional_body %}
-        {# <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/> #}
-    {% endblock %}
+
 
 

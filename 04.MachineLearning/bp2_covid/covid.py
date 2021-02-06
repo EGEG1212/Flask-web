@@ -73,7 +73,7 @@ def covid_index():
         yesrterday_str = yesrterday.strftime("%Y%m%d")
         print(yesrterday_str)
 
-        data = corona_data.get_corona_data(yesrterday_str, yesrterday_str)
+        data = get_corona_data(yesrterday_str, yesrterday_str)
     return render_template('covid/covid_doughnut.html', menu=menu, weather=get_weather(), data=data[1:18])
     # 만약 합계데이터 빼고 도넛파이차트그리려면 data=data부분을
     # data=data[1:]으로 수정. 합계가 0번째인덱스라서...
