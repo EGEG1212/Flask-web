@@ -10,12 +10,17 @@ import re
 from konlpy.tag import Okt
 import pandas as pd
 import matplotlib.pyplot as plt
+from tensorflow import keras
+from tensorflow.keras.applications.vgg16 import VGG16, decode_predictions
+from tensorflow.keras.applications.resnet50 import ResNet50, decode_predictions
+import numpy as np
+from PIL import Image
 from my_util.weather import get_weather
 
 aclsf_bp = Blueprint('aclsf_bp', __name__)
 menu = {'ho': 0, 'da': 0, 'ml': 1,
         'se': 0, 'co': 0, 'cg': 0, 'cr': 0, 'wc': 0,
-        'cf': 0, 'ac': 1, 're': 0, 'cu': 0}
+        'cf': 0, 'ac': 1, 're': 0, 'cu': 0 }
 
 
 def get_weather_main():
@@ -33,22 +38,25 @@ def get_weather_main():
 
 
 # 로딩하는데시간걸리는 아이를 stock,news,imdb처럼 시작시1회한번만실행되게
+# (집에서 작업하다가 학원컴에서 돌리려하니 static/model/에 모델이없음 ㅋㅋ)
 @aclsf_bp.before_app_first_request
 def before_app_first_request():
-    global imdb_count_lr, imdb_tfidf_lr, imdb_tfidf_sv
-    global naver_count_lr, naver_count_nb, naver_tfidf_lr, naver_tfidf_nb
-    global news_count_lr, news_tfidf_lr, news_tfidf_sv
-    print('============ Advanced Blueprint before_app_first_request() ==========')
-    imdb_count_lr = joblib.load('static/model/IMDB_count_lr.pkl')
-    imdb_tfidf_lr = joblib.load('static/model/IMDB_tfidf_lr.pkl')
-    imdb_tfidf_sv = joblib.load('static/model/IMDB_tfidf_sv.pkl')
-    naver_count_lr = joblib.load('static/model/naver_count_lr8196.pkl')
-    naver_count_nb = joblib.load('static/model/naver_count_nb8284.pkl')
-    naver_tfidf_lr = joblib.load('static/model/naver_tfidf_lr8298.pkl')
-    naver_tfidf_nb = joblib.load('static/model/naver_tfidf_nb8298.pkl')
-    news_count_lr = joblib.load('static/model/news_count_lr.pkl')
-    news_tfidf_lr = joblib.load('static/model/news_tfidf_lr.pkl')
-    news_tfidf_sv = joblib.load('static/model/news_tfidf_sv.pkl')
+    global resnet
+    resnet = ResNet50()
+#     global imdb_count_lr, imdb_tfidf_lr, imdb_tfidf_sv
+#     global naver_count_lr, naver_count_nb, naver_tfidf_lr, naver_tfidf_nb
+#     global news_count_lr, news_tfidf_lr, news_tfidf_sv
+#     print('============ Advanced Blueprint before_app_first_request() ==========')
+#     imdb_count_lr = joblib.load('static/model/IMDB_count_lr.pkl')
+#     imdb_tfidf_lr = joblib.load('static/model/IMDB_tfidf_lr.pkl')
+#     imdb_tfidf_sv = joblib.load('static/model/IMDB_tfidf_sv.pkl')
+#     naver_count_lr = joblib.load('static/model/naver_count_lr8196.pkl')
+#     naver_count_nb = joblib.load('static/model/naver_count_nb8284.pkl')
+#     naver_tfidf_lr = joblib.load('static/model/naver_tfidf_lr8298.pkl')
+#     naver_tfidf_nb = joblib.load('static/model/naver_tfidf_nb8298.pkl')
+#     news_count_lr = joblib.load('static/model/news_count_lr.pkl')
+#     news_tfidf_lr = joblib.load('static/model/news_tfidf_lr.pkl')
+#     news_tfidf_sv = joblib.load('static/model/news_tfidf_sv.pkl')
 
 
 @aclsf_bp.route('/digits', methods=['GET', 'POST'])
@@ -292,3 +300,28 @@ def news():
 
         return render_template('advanced/news_res.html', menu=menu, news=df.data[index],
                                res=result_dict, weather=get_weather())
+
+@aclsf_bp.route('/image', methods=['GET', 'POST'])
+def image():
+    menu = {'ho': 0, 'da': 0, 'ml': 0, 'de': 1,
+        'se': 0, 'co': 0, 'cg': 0, 'cr': 0, 'wc': 0,
+        'cf': 0, 'ac': 1, 're': 0, 'cu': 0 }
+    if request.method == 'GET':
+        return render_template('advanced/image.html', menu=menu, weather=get_weather())
+    else:
+        f_img = request.files['image']
+        file_img = os.path.join(current_app.root_path, 'static/upload/') + f_img.filename
+        f_img.save(file_img)
+        current_app.logger.debug(f"{f_img.filename}, {file_img}")
+
+        img = np.array(Image.open(file_img).resize((224, 224)))
+        ''' img = cv2.imread(file_img, -1)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = cv2.resize(img, (224, 224)) '''
+        yhat = resnet.predict(img.reshape(-1, 224, 224, 3))
+        label = decode_predictions(yhat)
+        label = label[0][0]
+        mtime = int(os.stat(file_img).st_mtime)
+        return render_template('advanced/image_res.html', menu=menu, weather=get_weather(),
+                               name=label[1], prob=np.round(label[2]*100, 2),
+                               filename=f_img.filename, mtime=mtime)    

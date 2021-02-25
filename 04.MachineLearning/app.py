@@ -22,6 +22,7 @@ from my_util.models import Fcuser  # 모델의 클래스 가져오기.
 # Simple integration of Flask and WTForms, including CSRF, file upload, and reCAPTCHA.
 from flask_wtf.csrf import CSRFProtect, CSRFError
 
+
 app = Flask(__name__)
 app.secret_key = 'qwert12345'
 app.config['SESSION_COOKIE_PATH'] = '/'
