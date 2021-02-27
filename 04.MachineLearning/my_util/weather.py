@@ -1,7 +1,7 @@
 from urllib.parse import urlparse
 import requests
 import pandas as pd
-key_fd = open('./my_util/openweatherkey.txt', mode='r')
+key_fd = open('./my_util/openweatherkey.txt', 'rt', encoding='UTF8')
 oweather_key = key_fd.read(100)
 key_fd.close()
 

@@ -23,7 +23,7 @@ from my_util.weather import get_weather
 aclsf_bp = Blueprint('aclsf_bp', __name__)
 menu = {'ho': 0, 'da': 0, 'ml': 1,
         'se': 0, 'co': 0, 'cg': 0, 'cr': 0, 'wc': 0,
-        'cf': 0, 'ac': 1, 're': 0, 'cu': 0 }
+        'cf': 0, 'ac': 1, 're': 0, 'cu': 0}
 
 
 def get_weather_main():
@@ -304,16 +304,18 @@ def news():
         return render_template('advanced/news_res.html', menu=menu, news=df.data[index],
                                res=result_dict, weather=get_weather())
 
+
 @aclsf_bp.route('/image', methods=['GET', 'POST'])
 def image():
     menu = {'ho': 0, 'da': 0, 'ml': 0, 'de': 1,
-        'se': 0, 'co': 0, 'cg': 0, 'cr': 0, 'wc': 0,
-        'cf': 0, 'ac': 1, 're': 0, 'cu': 0 }
+            'se': 0, 'co': 0, 'cg': 0, 'cr': 0, 'wc': 0,
+            'cf': 0, 'ac': 1, 're': 0, 'cu': 0}
     if request.method == 'GET':
         return render_template('advanced/image.html', menu=menu, weather=get_weather())
     else:
         f_img = request.files['image']
-        file_img = os.path.join(current_app.root_path, 'static/upload/') + f_img.filename
+        file_img = os.path.join(current_app.root_path,
+                                'static/upload/') + f_img.filename
         f_img.save(file_img)
         current_app.logger.debug(f"{f_img.filename}, {file_img}")
 
@@ -327,15 +329,20 @@ def image():
         mtime = int(os.stat(file_img).st_mtime)
         return render_template('advanced/image_res.html', menu=menu, weather=get_weather(),
                                name=label[1], prob=np.round(label[2]*100, 2),
-                               filename=f_img.filename, mtime=mtime) 
+                               filename=f_img.filename, mtime=mtime)
+
 
 @aclsf_bp.route('/detect', methods=['GET', 'POST'])
 def detect():
+    menu = {'ho': 0, 'da': 0, 'ml': 0, 'de': 1,
+            'se': 0, 'co': 0, 'cg': 0, 'cr': 0, 'wc': 0,
+            'cf': 0, 'ac': 1, 're': 0, 'cu': 0}
     if request.method == 'GET':
         return render_template('advanced/detect.html', menu=menu, weather=get_weather())
     else:
         f_img = request.files['image']
-        file_img = os.path.join(current_app.root_path, 'static/upload/') + f_img.filename
+        file_img = os.path.join(current_app.root_path,
+                                'static/upload/') + f_img.filename
         f_img.save(file_img)
         _, image_type = os.path.splitext(f_img.filename)
         image_type = 'jpg' if image_type == '.jfif' else image_type[1:]
@@ -376,12 +383,15 @@ def detect():
             y = int(obj['y'])
             w = int(obj['width'])
             h = int(obj['height'])
-            draw.text((x+10,y+10), name, font=ImageFont.truetype('malgun.ttf', 20), fill=(255,0,0))
-            draw.rectangle(((x, y), (x+w, y+h)), outline=(255,0,0), width=2)
+            draw.text((x+10, y+10), name,
+                      font=ImageFont.truetype('malgun.ttf', 20), fill=(255, 0, 0))
+            draw.rectangle(((x, y), (x+w, y+h)), outline=(255, 0, 0), width=2)
             object_list.append(name)
-        object_img = os.path.join(current_app.root_path, 'static/img/object.'+image_type)
+        object_img = os.path.join(
+            current_app.root_path, 'static/img/object.'+image_type)
         image.save(object_img)
         mtime = int(os.stat(object_img).st_mtime)
         return render_template('advanced/detect_res.html', menu=menu, weather=get_weather(),
-                               object_list=', '.join(obj for obj in object_list),
-                               filename='object.'+image_type, mtime=mtime) 
+                               object_list=', '.join(
+                                   obj for obj in object_list),
+                               filename='object.'+image_type, mtime=mtime)
